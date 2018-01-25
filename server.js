@@ -1,8 +1,8 @@
 'use strict';
 
 const net = require('net');
-const client = require('../lib/client');
-const cmd = require('../lib/cmd');
+const client = require('./lib/client');
+const cmd = require('./lib/cmd');
 
 const server = module.exports = net.createServer();
 const PORT = process.env.PORT || 3000;
@@ -20,7 +20,7 @@ socket.on('data', function(data){
 });
 
 socket.on('list', function() {
-    client.socket.write(`\n\tConnected Users:\n`); //Sent a notification
+    client.socket.write(`\n\tConnected Users:\n`);
     client.Pool.map(c => client.socket.write(`\n\t${c.nick}\n`));
 });
 
@@ -33,6 +33,10 @@ socket.on('dm', function(data) {
     let person = clientPool.filter(c => c.nick === data.name);
     person[0].socket.write(`\nWhisper: ${client.nick}: ${data.said}\n`);
     client.socket.write(`\nWhisper: ${data.name}: ${data.said}\n`);
+});
+
+socket.on('end', function() {
+    socket.end();
 });
 
 socket.on('close', function(){
